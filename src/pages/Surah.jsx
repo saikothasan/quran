@@ -5,6 +5,7 @@ import axios from 'axios';
 const Surah = () => {
   const { id } = useParams();
   const [surah, setSurah] = useState(null);
+  const [translations, setTranslations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,14 +13,23 @@ const Surah = () => {
       try {
         const response = await axios.get(`https://api.alquran.cloud/v1/surah/${id}`);
         setSurah(response.data.data);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching the Surah:', error);
-        setLoading(false);
+      }
+    };
+
+    const fetchTranslations = async () => {
+      try {
+        const response = await axios.get(`https://api.alquran.cloud/v1/surah/${id}/editions/en.asad,en.ahmedali,en.arberry,en.hamidullah,en.pickthall,en.saheeh,en.yusufali`);
+        setTranslations(response.data.data);
+      } catch (error) {
+        console.error('Error fetching the translations:', error);
       }
     };
 
     fetchSurah();
+    fetchTranslations();
+    setLoading(false);
   }, [id]);
 
   if (loading) {
@@ -37,6 +47,19 @@ const Surah = () => {
           </li>
         ))}
       </ul>
+      <h3 className="text-2xl font-bold mt-6">Translations</h3>
+      {translations.map((translation, index) => (
+        <div key={index} className="mt-4">
+          <h4 className="text-xl font-semibold">{translation.edition.name} ({translation.edition.language})</h4>
+          <ul className="space-y-2">
+            {translation.ayahs.map(ayah => (
+              <li key={ayah.numberInSurah} className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <span className="text-blue-600 font-bold">{ayah.numberInSurah}:</span> {ayah.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 };
