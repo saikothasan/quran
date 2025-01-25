@@ -4,7 +4,6 @@ import Home from './pages/Home';
 import Surah from './pages/Surah';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import './index.css';
 
 function App() {
   return (
